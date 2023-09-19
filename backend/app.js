@@ -9,7 +9,7 @@ if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config({ path: 'config/config.env' })
 }
 
-app.use(cors())
+app.use(cors({ origin: 'https://social-media-supradeep.onrender.com/' }))
 
 // using middlewares
 app.use(express.json({ limit: '50mb' }))
