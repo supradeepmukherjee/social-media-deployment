@@ -3,7 +3,6 @@ const cp = require('cookie-parser')
 const app = express()
 const path = require('path')
 const cors = require('cors')
-const corsOptions = require('./config/corsOptions')
 
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config({ path: 'config/config.env' })
