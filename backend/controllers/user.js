@@ -210,7 +210,7 @@ exports.forgotPassword = async (req, res) => {
         if (!user) return res.status(404).json({ success: false, msg: "user not found" })
         const resetPasswordToken = await user.getResetPasswordToken()
         await user.save()
-        const resetUrl = `${req.protocol}://${req.get('host')}/resetpassword/${resetPasswordToken}`
+        const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/resetpassword/${resetPasswordToken}`
         const text = `Reset your password by clicking on the link below:\n\n ${resetUrl}`
         try {
             await sendEmail({ to: user.email, subject: 'Reset your password', text })
