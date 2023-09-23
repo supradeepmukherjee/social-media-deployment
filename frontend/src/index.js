@@ -5,9 +5,6 @@ import { Provider } from 'react-redux';
 import store from './store';
 import { Provider as AlertProvider, positions, transitions } from 'react-alert'
 import Template from 'react-alert-template-basic'
-import { disableReactDevTools } from '@fvilers/disable-react-devtools'
-
-disableReactDevTools()
 
 const options = {
   postion: positions.BOTTOM_CENTER,
