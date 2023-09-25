@@ -1,114 +1,135 @@
-import { createReducer } from "@reduxjs/toolkit";
+import { createReducer, createAction } from "@reduxjs/toolkit";
 
-const initialState = {
-    isAuthenticated: false
-}
+const loginRequest = createAction('loginRequest')
+const loginSuccess = createAction('loginSuccess')
+const loginFailure = createAction('loginFailure')
+const registerRequest = createAction('registerRequest')
+const registerSuccess = createAction('registerSuccess')
+const registerFailure = createAction('registerFailure')
+const loadUserRequest = createAction('loadUserRequest')
+const loadUserSuccess = createAction('loadUserSuccess')
+const loadUserFailure = createAction('loadUserFailure')
+const logoutUserRequest = createAction('logoutUserRequest')
+const logoutUserSuccess = createAction('logoutUserSuccess')
+const logoutUserFailure = createAction('logoutUserFailure')
+const allUsersRequest = createAction('allUsersRequest')
+const allUsersSuccess = createAction('allUsersSuccess')
+const allUsersFailure = createAction('allUsersFailure')
+const userProfileRequest = createAction('userProfileRequest')
+const userProfileSuccess = createAction('userProfileSuccess')
+const userProfileFailure = createAction('userProfileFailure')
+const postOfFollowingRequest = createAction('postOfFollowingRequest')
+const postOfFollowingSuccess = createAction('postOfFollowingSuccess')
+const postOfFollowingFailure = createAction('postOfFollowingFailure')
+const clearError = createAction('clearError')
 
-export const userReducer = createReducer(initialState, {
-    loginRequest: state => {
+const initialState = { isAuthenticated: false }
+
+export const userReducer = createReducer(initialState, builder => {
+    builder.addCase(loginRequest, state => {
         state.loading = true
-    },
-    loginSuccess: (state, action) => {
+    })
+    builder.addCase(loginSuccess, (state, action) => {
         state.loading = false
         state.user = action.payload
         state.isAuthenticated = true
-    },
-    loginFailure: (state, action) => {
+    })
+    builder.addCase(loginFailure, (state, action) => {
         state.loading = false
         state.error = action.payload
         state.isAuthenticated = false
-    },
-    registerRequest: state => {
+    })
+    builder.addCase(registerRequest, state => {
         state.loading = true
-    },
-    registerSuccess: (state, action) => {
+    })
+    builder.addCase(registerSuccess, (state, action) => {
         state.loading = false
         state.user = action.payload
         state.isAuthenticated = true
-    },
-    registerFailure: (state, action) => {
+    })
+    builder.addCase(registerFailure, (state, action) => {
         state.loading = false
         state.error = action.payload
         state.isAuthenticated = false
-    },
-    loadUserRequest: state => {
+    })
+    builder.addCase(loadUserRequest, state => {
         state.loading = true
-    },
-    loadUserSuccess: (state, action) => {
+    })
+    builder.addCase(loadUserSuccess, (state, action) => {
         state.loading = false
         state.user = action.payload
         state.isAuthenticated = true
-    },
-    loadUserFailure: (state, action) => {
+    })
+    builder.addCase(loadUserFailure, (state, action) => {
         state.loading = false
         state.error = action.payload
         state.isAuthenticated = false
-    },
-    logoutUserRequest: state => {
+    })
+    builder.addCase(logoutUserRequest, state => {
         state.loading = true
-    },
-    logoutUserSuccess: state => {
+    })
+    builder.addCase(logoutUserSuccess, state => {
         state.loading = false
         state.user = null
         state.isAuthenticated = false
-    },
-    logoutUserFailure: (state, action) => {
+    })
+    builder.addCase(logoutUserFailure, (state, action) => {
         state.loading = false
         state.error = action.payload
         state.isAuthenticated = true
-    },
-    clearError: state => {
+    })
+    builder.addCase(clearError, state => {
         state.error = null
-    }
+    })
 })
 
-export const allUsersReducer = createReducer(initialState, {
-    allUsersRequest: state => {
+export const allUsersReducer = createReducer(initialState, builder => {
+    builder.addCase(allUsersRequest, state => {
         state.loading = true
-    },
-    allUsersSuccess: (state, action) => {
+    })
+    builder.addCase(allUsersSuccess, (state, action) => {
         state.loading = false
         state.users = action.payload
-    },
-    allUsersFailure: (state, action) => {
+    })
+    builder.addCase(allUsersFailure, (state, action) => {
         state.loading = false
         state.error = action.payload
-    },
-    clearError: state => {
+    })
+    builder.addCase(clearError, state => {
         state.error = null
-    }
+    })
 })
 
-export const userProfileReducer = createReducer(initialState, {
-    userProfileRequest: state => {
+export const userProfileReducer = createReducer(initialState, builder => {
+    builder.addCase(userProfileRequest, state => {
         state.loading = true
-    },
-    userProfileSuccess: (state, action) => {
+    })
+    builder.addCase(userProfileSuccess, (state, action) => {
         state.loading = false
         state.user = action.payload
-    },
-    userProfileFailure: (state, action) => {
+    })
+    builder.addCase(userProfileFailure, (state, action) => {
         state.loading = false
         state.error = action.payload
-    },
-    clearError: state => {
+    })
+    builder.addCase(clearError, state => {
         state.error = null
-    }
+    })
 })
 
-export const postOfFollowingReducer = createReducer(initialState, {
-    postOfFollowingRequest: state => {
+export const postOfFollowingReducer = createReducer(initialState, builder => {
+    builder.addCase(postOfFollowingRequest, state => {
         state.loading = true
-    },
-    postOfFollowingSuccess: (state, action) => {
+    })
+    builder.addCase(postOfFollowingSuccess, (state, action) => {
         state.loading = false
         state.posts = action.payload
-    },
-    postOfFollowingFailure: (state, action) => {
+    })
+    builder.addCase(postOfFollowingFailure, (state, action) => {
         state.loading = false
         state.error = action.payload
-    },
-    clearError: state => {
+    })
+    builder.addCase(clearError, state => {
         state.error = null
-    }
+    })
 })
