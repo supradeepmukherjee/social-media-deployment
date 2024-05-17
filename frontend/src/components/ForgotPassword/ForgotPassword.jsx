@@ -1,29 +1,19 @@
 import { Button, Typography } from '@mui/material'
-import { useEffect, useState } from 'react'
-import { useAlert } from 'react-alert'
-import { useDispatch, useSelector } from 'react-redux'
-import { forgotPassword } from '../../Actions/User'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import useMutation from '../../hooks/useMutation'
+import { useForgotPasswordMutation } from '../../redux/api/user'
 import './ForgotPassword.css'
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState('')
-    const { loading, msg, error } = useSelector(state => state.like)
-    const dispatch = useDispatch()
-    const alert = useAlert()
+    const [forgotPassword, loading] = useMutation(useForgotPasswordMutation)
+    const navigate = useNavigate()
     const submitHandler = async e => {
         e.preventDefault()
-        dispatch(forgotPassword(email))
+        await forgotPassword('Sending Password Reset Link to Registering Email ID', email)
+        navigate('/')
     }
-    useEffect(() => {
-        if (msg) {
-            alert.success(msg)
-            dispatch({ type: 'clearMsg' })
-        }
-        if (error) {
-            alert.error(error)
-            dispatch({ type: 'clearError' })
-        }
-    }, [alert, dispatch, error, msg])
     return (
         <div className='forgotPassword'>
             <form className='forgotPasswordForm' action="" onSubmit={submitHandler}>

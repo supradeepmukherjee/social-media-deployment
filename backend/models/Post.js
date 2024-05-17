@@ -1,13 +1,13 @@
-const mongoose = require('mongoose')
+import mongoose, { Schema, model, Types } from 'mongoose'
 
-const postSchema = new mongoose.Schema({
+const postSchema = new Schema({
     caption: String,
     img: {
         public_id: String,
         url: String
     },
     owner: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Types.ObjectId,
         ref: 'User'
     },
     createdAt: {
@@ -15,12 +15,12 @@ const postSchema = new mongoose.Schema({
         default: Date.now
     },
     likes: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: Types.ObjectId,
         ref: 'User'
     }],
     comments: [{
         user: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Types.ObjectId,
             ref: 'User'
         },
         comment: {
@@ -30,4 +30,4 @@ const postSchema = new mongoose.Schema({
     }]
 })
 
-module.exports = mongoose.model('Post', postSchema)
+export const Post = mongoose.models.Post || model('Post', postSchema)

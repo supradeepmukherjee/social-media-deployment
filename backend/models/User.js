@@ -1,9 +1,9 @@
-const mongoose = require('mongoose')
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
-const crypto = require('crypto')
+import mongoose, { Schema, Types, model } from 'mongoose'
+import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
+import { randomBytes, createHash } from 'crypto'
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
     name: {
         type: String,
         required: [true, "Please enter a name"]
@@ -24,15 +24,15 @@ const userSchema = new mongoose.Schema({
         select: false
     },
     posts: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: Types.ObjectId,
         ref: 'Post'
     }],
     followers: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: Types.ObjectId,
         ref: 'User'
     }],
     following: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: Types.ObjectId,
         ref: 'User'
     }],
     resetPasswordToken: String,
@@ -54,11 +54,11 @@ userSchema.methods.generateToken = async function () {
     return jwt.sign({ id: this._id }, process.env.JWT_SECRET)
 }
 userSchema.methods.getResetPasswordToken = async function () {
-    const resetToken = crypto.randomBytes(20).toString('hex')
+    const resetToken = randomBytes(20).toString('hex')
     console.log(resetToken)
-    this.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex')
+    this.resetPasswordToken = createHash('sha256').update(resetToken).digest('hex')
     this.resetPasswordExpiry = Date.now() + 600000
     return resetToken
 }
 
-module.exports = mongoose.model('User', userSchema)
+export const User = mongoose.models.User || model('User', userSchema)

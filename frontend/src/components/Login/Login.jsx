@@ -1,32 +1,27 @@
 import { Button, Typography } from '@mui/material'
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import { loginUser } from '../../Actions/User'
+import { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { Link, useNavigate } from 'react-router-dom'
+import useMutation from '../../hooks/useMutation'
+import { useLazyGetUserQuery, useLoginMutation } from '../../redux/api/user'
+import { userExists, userNotExists } from '../../redux/reducers/auth'
 import './Login.css'
-import { useAlert } from 'react-alert'
 
 const Login = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const dispatch = useDispatch()
-    const alert = useAlert()
-    const { error } = useSelector(state => state.user)
-    const { msg } = useSelector(state => state.like)
-    const loginHandler = e => {
+    const navigate = useNavigate()
+    const [login, loading] = useMutation(useLoginMutation)
+    const [getUser] = useLazyGetUserQuery()
+    const loginHandler = async e => {
         e.preventDefault()
-        dispatch(loginUser(email, password))
+        await login('Logging In', { email, password })
+        getUser()
+            .then(({ data }) => dispatch(userExists(data.user)))
+            .catch(() => dispatch(userNotExists()))
+        navigate('/')
     }
-    useEffect(() => {
-        if (error === 400) {
-            alert.error('Email ID/Password is incorrect')
-            dispatch({ type: 'clearError' })
-        }
-        if (msg) {
-            alert.success(msg)
-            dispatch({ type: 'clearMsg' })
-        }
-    }, [alert, dispatch, error, msg])
     return (
         <div className='login'>
             <form className='loginForm' action="" onSubmit={loginHandler}>
@@ -40,7 +35,7 @@ const Login = () => {
                         Forgot Password?
                     </Typography>
                 </Link>
-                <Button type='submit'>
+                <Button type='submit' disabled={loading}>
                     Login
                 </Button>
                 <Link to={'/register'}>

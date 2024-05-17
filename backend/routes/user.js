@@ -1,22 +1,27 @@
-const express = require('express')
-const { register, login, follow, logout, updatePassword, updateProfile, deleteProfile, myProfile, getAllUsers, getUserProfile, forgotPassword, resetPassword, getMyPosts, getUserPosts } = require('../controllers/user')
-const { isAuthenticated } = require('../middlewares/auth')
+import { Router } from 'express'
+import { deleteProfile, follow, forgotPassword, getAllUsers, getMyPosts, getUserPosts, getUserProfile, login, logout, myProfile, register, resetPassword, updateCaption, updatePassword, updateProfile } from '../controllers/user.js'
+import { isAuthenticated } from '../middlewares/auth.js'
+import upload from '../middlewares/multer.js'
 
-const router = express.Router()
+const app = Router()
 
-router.route('/register').post(register)
-router.route('/login').post(login)
-router.route('/logout').get(logout)
-router.route('/myProfile').get(isAuthenticated, myProfile)
-router.route('/follow/:id').get(isAuthenticated, follow)
-router.route('/update/password').put(isAuthenticated, updatePassword)
-router.route('/update/profile').put(isAuthenticated, updateProfile)
-router.route('/del').delete(isAuthenticated, deleteProfile)
-router.route('/all').get(isAuthenticated, getAllUsers)
-router.route('/profile/:user').get(isAuthenticated, getUserProfile)
-router.route('/forgotpassword').post(forgotPassword)
-router.route('/resetpassword/:token').put(resetPassword)
-router.route('/myposts').get(isAuthenticated, getMyPosts)
-router.route('/userposts/:id').get(isAuthenticated, getUserPosts)
+app.post('/register', upload, register)
+app.post('/login', login)
+app.get('/logout', logout)
+app.post('/forgotpassword', forgotPassword)
+app.put('/resetpassword/:token', resetPassword)
 
-module.exports = router
+app.use(isAuthenticated)
+app.post('/upload', upload, createPost)
+app.get('/myProfile', myProfile)
+app.put('/follow/:id', follow)
+app.put('/update/password', updatePassword)
+app.put('/update/profile', upload, updateProfile)
+app.delete('/del', deleteProfile)
+app.get('/all', getAllUsers)
+app.get('/profile/:user', getUserProfile)
+app.get('/my-posts', getMyPosts)
+app.get('/user-posts/:id', getUserPosts)
+app.put('/update-caption/:id', updateCaption)
+
+export default app

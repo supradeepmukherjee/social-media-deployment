@@ -1,17 +1,21 @@
 import { Button, Typography } from '@mui/material'
 import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { getAllUsers } from '../../Actions/User'
+import { useLazyAllUsersQuery } from '../../redux/api/user'
 import User from '../User'
 import './Search.css'
 
 const Search = () => {
     const [name, setName] = useState('')
-    const dispatch = useDispatch()
-    const { loading, users } = useSelector(state => state.allUsers)
+    const [users, setUsers] = useState([])
+    const [loading, setLoading] = useState(false)
+    const [allUsers] = useLazyAllUsersQuery()
     const submitHandler = async e => {
         e.preventDefault()
-        dispatch(getAllUsers(name))
+        setLoading(true)
+        allUsers(name)
+            .then(({ data }) => setUsers(data.users))
+            .catch(err => console.log(err))
+            .finally(() => setLoading(false))
     }
     return (
         <div className='search'>
@@ -24,11 +28,11 @@ const Search = () => {
                     Search
                 </Button>
                 <div className="searchResults">
-                    {users && users.map(user => <User
-                        key={user.id}
-                        userID={user.id}
-                        name={user.name}
-                        chavi={user.chavi.url} />)}
+                    {users?.map(({ _id, name, chavi }) => <User
+                        key={_id}
+                        userID={_id}
+                        name={name}
+                        chavi={chavi.url} />)}
                 </div>
             </form>
         </div>

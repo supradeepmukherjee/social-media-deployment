@@ -1,15 +1,18 @@
-import { ChatBubbleOutline, DeleteOutline, FavoriteBorder, Favorite, MoreVert } from '@mui/icons-material'
+import { ChatBubbleOutline, DeleteOutline, Favorite, FavoriteBorder, MoreVert } from '@mui/icons-material'
 import { Avatar, Button, Dialog, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { addComment, delPost, likePost, updateCaption } from '../../Actions/Post'
-import User from '../User'
 import { Link } from 'react-router-dom'
-import { getFollowingPost, getMyPosts, getUserPosts, loadUser } from '../../Actions/User'
+import useMutation from '../../hooks/useMutation'
+import { useCommentMutation, useDelPostMutation, useLikeUnlikeMutation } from '../../redux/api/post'
+import { useLazyGetUserQuery, useUpdateCaptionMutation } from '../../redux/api/user'
+import { userExists, userNotExists } from '../../redux/reducers/auth'
 import CommentCard from '../CommentCard/CommentCard'
+import User from '../User'
 import './Post.css'
 
-const Post = ({ postID, caption, postImg, likes = [], comments = [], ownerImg, ownerName, ownerID, isDelete = false, isAccount = false, page = '', userID }) => {
+// eslint-disable-next-line react/prop-types
+const Post = ({ postID, caption, postImg, likes = [], comments = [], ownerImg, ownerName, ownerID, isDelete = false, isAccount = false, page = '', userID, refetch }) => {
     const [liked, setLiked] = useState(false)
     const [likesUser, setLikesUser] = useState(false)
     const [commentValue, setCommentValue] = useState('')
@@ -17,30 +20,36 @@ const Post = ({ postID, caption, postImg, likes = [], comments = [], ownerImg, o
     const [captionValue, setCaptionValue] = useState('')
     const [captionToggle, setCaptionToggle] = useState(false)
     const dispatch = useDispatch()
-    const { user } = useSelector(state => state.user)
+    const { user } = useSelector(({ auth }) => auth)
+    const [getUser] = useLazyGetUserQuery()
+    const [likeUnlike, loading] = useMutation(useLikeUnlikeMutation)
+    const [updateCaption, captionLoading] = useMutation(useUpdateCaptionMutation)
+    const [delPost, postLoading] = useMutation(useDelPostMutation)
+    const [comment, commentLoading] = useMutation(useCommentMutation)
     const handleLike = async () => {
         setLiked(!liked)
-        await dispatch(likePost(postID))
-        if (isAccount) dispatch(getMyPosts())
-        else dispatch(getFollowingPost())
-        if (page === 'user') dispatch(getUserPosts(userID))
+        await likeUnlike(`${liked ? 'Liking' : 'Unliking'} Post`, postID)
+        // if (isAccount) dispatch(getMyPosts())
+        // else dispatch(getFollowingPost())
+        // if (page === 'user') dispatch(getUserPosts(userID))
+        refetch()
     }
     const updateCaptionHandler = async e => {
         e.preventDefault()
-        await dispatch(updateCaption(postID, captionValue))
-        dispatch(getMyPosts())
+        await updateCaption('Updating Caption', { id: postID, caption: captionValue })
+        refetch()
     }
     const handleDel = async () => {
-        await dispatch(delPost(postID))
-        dispatch(getMyPosts())
-        dispatch(loadUser())
+        await delPost('Deleting Post', postID)
+        getUser()
+            .then(({ data }) => dispatch(userExists(data.user)))
+            .catch(() => dispatch(userNotExists()))
+        refetch()
     }
-    const formHandler = async e => {
+    const commentHandler = async e => {
         e.preventDefault()
-        await dispatch(addComment(postID, commentValue))
-        if (isAccount) {
-            dispatch(getMyPosts())
-        } else dispatch(getFollowingPost())
+        await comment('Adding Comment', { id: postID, comment: commentValue })
+        refetch()
     }
     useEffect(() => {
         likes.forEach(item => {
@@ -74,14 +83,14 @@ const Post = ({ postID, caption, postImg, likes = [], comments = [], ownerImg, o
                 </Typography>
             </button>
             <div className="postFooter">
-                <Button onClick={handleLike}>
+                <Button onClick={handleLike} disabled={loading}>
                     {liked ? <Favorite style={{ color: 'red' }} /> : <FavoriteBorder />}
                 </Button>
                 <Button onClick={() => setCommentToggle(!commentToggle)}>
                     <ChatBubbleOutline />
                 </Button>
                 {isDelete ?
-                    <Button onClick={handleDel}>
+                    <Button onClick={handleDel} disabled={postLoading}>
                         <DeleteOutline />
                     </Button>
                     : null}
@@ -99,14 +108,14 @@ const Post = ({ postID, caption, postImg, likes = [], comments = [], ownerImg, o
                     <Typography variant='h4'>
                         Comments
                     </Typography>
-                    <form className='commentForm' onSubmit={formHandler}>
+                    <form className='commentForm' onSubmit={commentHandler}>
                         <input type="text" value={commentValue} onChange={e => setCommentValue(e.target.value)} placeholder='Type your comment' required />
-                        <Button variant='contained' type='submit'>
+                        <Button variant='contained' type='submit' disabled={commentLoading}>
                             Submit
                         </Button>
                     </form>
                     {comments.length > 0 ?
-                        comments.map(comment => <CommentCard userID={comment.user._id} name={comment.user.name} chavi={comment.user.chavi.url} comment={comment.comment} commentID={comment._id} key={comment._id} postID={postID} isAccount={isAccount} />)
+                        comments.map(comment => <CommentCard userID={comment.user._id} name={comment.user.name} chavi={comment.user.chavi.url} comment={comment.comment} commentID={comment._id} key={comment._id} postID={postID} isAccount={isAccount} refetch={refetch} />)
                         :
                         <Typography>
                             No Comments yet
@@ -121,7 +130,7 @@ const Post = ({ postID, caption, postImg, likes = [], comments = [], ownerImg, o
                     </Typography>
                     <form className='commentForm' onSubmit={updateCaptionHandler}>
                         <input type="text" value={captionValue} onChange={e => setCaptionValue(e.target.value)} placeholder='Type your new caption' required />
-                        <Button variant='contained' type='submit'>
+                        <Button variant='contained' type='submit' disabled={captionLoading}>
                             Update
                         </Button>
                     </form>

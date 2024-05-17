@@ -1,42 +1,41 @@
 import { Button, Typography } from '@mui/material'
-import { useEffect, useState } from 'react'
-import { useAlert } from 'react-alert'
-import { useDispatch, useSelector } from 'react-redux'
-import { newPost } from '../../Actions/Post'
-import { getMyPosts, loadUser } from '../../Actions/User'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
+import { useDispatch } from 'react-redux'
+import useMutation from '../../hooks/useMutation'
+import { useLazyGetUserQuery, useLazyMyPostsQuery } from '../../redux/api/user'
+import { useUploadMutation } from '../../redux/api/user'
+import { userExists, userNotExists } from '../../redux/reducers/auth'
 import './NewPost.css'
 
 const NewPost = () => {
     const [img, setImg] = useState(null)
     const [caption, setCaption] = useState('')
+    const [imgFile, setImgFile] = useState(null)
     const dispatch = useDispatch()
-    const alert = useAlert()
-    const { loading, error, msg } = useSelector(state => state.like)
+    const [createPost, loading] = useMutation(useUploadMutation)
+    const [getUser] = useLazyGetUserQuery()
     const handleImgChange = async e => {
         const file = e.target.files[0]
         const reader = new FileReader()
         reader.readAsDataURL(file)
-        reader.onload = async () => {
-            if (reader.readyState === 2) setImg(reader.result)
+        reader.onloadend = async () => {
+            setImg(reader.result)
         }
+        setImgFile(file)
     }
     const submitHandler = async e => {
         e.preventDefault()
-        await dispatch(newPost(img, caption))
-        dispatch(getMyPosts())
-        dispatch(loadUser())
+        if (caption !== '') return toast.error('Caption can\'t be blank')
+        if (!imgFile) return toast.error('Please upload Image')
+        const formData = new FormData()
+        formData.set('caption', caption)
+        formData.set('img', imgFile)
+        await createPost('Uploading new Post', formData)
+        getUser()
+            .then(({ data }) => dispatch(userExists(data.user)))
+            .catch(() => dispatch(userNotExists()))
     }
-    useEffect(() => {
-        if (error) {
-            alert.error(error)
-            dispatch({ type: 'clearError' })
-        }
-        if (msg) {
-            alert.success(msg)
-            dispatch({ type: 'clearMsg' })
-        }
-    }, [alert, dispatch, error, msg])
-
     return (
         <div className='newPost'>
             <form className='newPostForm' onSubmit={submitHandler}>

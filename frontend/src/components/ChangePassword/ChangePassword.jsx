@@ -1,32 +1,27 @@
 import { Button, Typography } from '@mui/material'
-import { useEffect, useState } from 'react'
-import { useAlert } from 'react-alert'
-import { useDispatch, useSelector } from 'react-redux'
-import { changePassword } from '../../Actions/User'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
+import useMutation from '../../hooks/useMutation'
+import { useChangePasswordMutation } from '../../redux/api/user'
+import { passwordValidator } from '../../utils/validators'
 import './ChangePassword.css'
 
 const ChangePassword = () => {
     const [oldPassword, setOldPassword] = useState('')
     const [password, setPassword] = useState('')
     const [cpassword, setcPassword] = useState('')
-    const { loading, error, msg } = useSelector(state => state.like)
-    const dispatch = useDispatch()
-    const alert = useAlert()
-    const submitHandler = e => {
+    const navigate = useNavigate('/')
+    const [changePassword, loading] = useMutation(useChangePasswordMutation)
+    const submitHandler = async e => {
         e.preventDefault()
-        if (password === cpassword) dispatch(changePassword(oldPassword, password))
-        else alert('New Password and Confirmed Password do not match')
+        let validationMsg = ''
+        validationMsg = passwordValidator(password) || ''
+        if (validationMsg !== '') return toast.error(validationMsg)
+        if (password !== cpassword) return toast.error('Passwords don\'t match ')
+        await changePassword('Updating Password', { old: oldPassword, newP: password })
+        navigate('/account')
     }
-    useEffect(() => {
-        if (error) {
-            alert.error(error)
-            dispatch({ type: 'clearError' })
-        }
-        if (msg) {
-            alert.success(msg)
-            dispatch({ type: 'clearMsg' })
-        }
-    }, [alert, dispatch, error, msg])
     return (
         <div className='login'>
             <form className='loginForm' action="" onSubmit={submitHandler}>

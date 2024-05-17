@@ -1,33 +1,27 @@
 import { Button, Typography } from '@mui/material'
-import { useEffect, useState } from 'react'
-import { useAlert } from 'react-alert'
-import { useDispatch, useSelector } from 'react-redux'
-import { Link, useParams } from 'react-router-dom'
-import { resetPassword } from '../../Actions/User'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import useMutation from '../../hooks/useMutation'
+import { useResetPasswordMutation } from '../../redux/api/user'
+import { passwordValidator } from '../../utils/validators'
 import './ResetPassword.css'
 
 const ResetPassword = () => {
     const [password, setPassword] = useState('')
     const [cpassword, setcPassword] = useState('')
-    const { loading, msg, error } = useSelector(state => state.like)
-    const dispatch = useDispatch()
-    const alert = useAlert()
     const { token } = useParams()
+    const navigate = useNavigate()
+    const [resetPassword, loading] = useMutation(useResetPasswordMutation)
     const submitHandler = async e => {
         e.preventDefault()
-        if (password === cpassword) dispatch(resetPassword(token, password))
-        else alert('Passwords do not match')
+        let validationMsg = ''
+        validationMsg = passwordValidator(password) || ''
+        if (validationMsg !== '') return toast.error(validationMsg)
+        if (password !== cpassword) return toast.error('Passwords don\'t match ')
+        await resetPassword('Resetting Password', { token, password })
+        navigate('/')
     }
-    useEffect(() => {
-        if (msg) {
-            alert.success(msg)
-            dispatch({ type: 'clearMsg' })
-        }
-        if (error) {
-            alert.error(error)
-            dispatch({ type: 'clearError' })
-        }
-    }, [alert, dispatch, error, msg])
     return (
         <div className='resetPassword'>
             <form className='resetPasswordForm' action="" onSubmit={submitHandler}>

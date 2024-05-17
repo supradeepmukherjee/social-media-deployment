@@ -1,19 +1,17 @@
 import { Delete } from '@mui/icons-material'
 import { Button, Typography } from '@mui/material'
-import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { delComment } from '../../Actions/Post'
-import { getFollowingPost, getMyPosts } from '../../Actions/User'
+import useMutation from '../../hooks/useMutation'
+import { useDelCommentMutation } from '../../redux/api/post'
 import './CommentCard.css'
 
-const CommentCard = ({ userID, name, chavi, comment, commentID, postID, isAccount }) => {
-    const { user } = useSelector(state => state.user)
-    const dispatch = useDispatch()
+const CommentCard = ({ userID, name, chavi, comment, commentID, postID, isAccount, refetch }) => {
+    const { user } = useSelector(({ auth }) => auth)
+    const [delComment, loading] = useMutation(useDelCommentMutation)
     const del = async () => {
-        await dispatch(delComment(postID, commentID))
-        if (isAccount) dispatch(getMyPosts())
-        else dispatch(getFollowingPost())
+        await delComment('Deleting Comment', { id: postID, commentID })
+        refetch()
     }
     return (
         <div className='commentUser'>
@@ -27,16 +25,16 @@ const CommentCard = ({ userID, name, chavi, comment, commentID, postID, isAccoun
                 {comment}
             </Typography>
             {isAccount ?
-                <Button onClick={del}>
+                <Button onClick={del} disabled={loading}>
                     <Delete />
                 </Button>
                 :
                 (userID === user._id ?
-                    <Button onClick={del}>
+                    <Button onClick={del} disabled={loading}>
                         <Delete />
                     </Button>
-                    : null)}
-        </div >
+                    : <></>)}
+        </div>
     )
 }
 
