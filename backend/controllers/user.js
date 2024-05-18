@@ -5,6 +5,7 @@ import sendEmail from '../middlewares/sendEmail.js'
 import { Post } from '../models/Post.js'
 import { User } from '../models/User.js'
 import upload from '../utils/cloudinary.js'
+import sendToken from '../utils/jwtToken.js'
 import { ErrorHandler } from '../utils/utility.js'
 
 const createPost = tryCatch(async (req, res) => {
@@ -25,7 +26,7 @@ const createPost = tryCatch(async (req, res) => {
     res.status(201).json({ success: true, msg: 'New post created' })
 })
 
-const register = tryCatch(async (req, res) => {
+const register = tryCatch(async (req, res, next) => {
     const { name, email, password } = req.body
     let user = await User.findOne({ email })
     if (user) return next(new ErrorHandler(400, 'User already exists'))
@@ -40,8 +41,7 @@ const register = tryCatch(async (req, res) => {
             url: myCloud.secure_url
         }
     })
-    const token = await user.generateToken()
-    res.status(201).cookie('token', token, { expires: new Date(Date.now() + (90 * 24 * 60 * 60000)) }).json({ success: true, user, token })
+    sendToken(user, 201, res, 'Registered Successfully')
 })
 
 const login = tryCatch(async (req, res) => {
@@ -51,8 +51,7 @@ const login = tryCatch(async (req, res) => {
     if (!user) return next(new ErrorHandler(404, 'User doesn\'t exist'))
     const isMatch = await user.matchPassword(password)
     if (!isMatch) return next(new ErrorHandler(400, 'User or Password is incorrect'))
-    const token = await user.generateToken()
-    res.status(200).cookie('token', token, { expires: new Date(Date.now() + (90 * 24 * 60 * 60000)) }).json({ success: true, user, token })
+    sendToken(user, 201, res, `Welcome back, ${user.name}`)
 })
 
 const follow = tryCatch(async (req, res) => {

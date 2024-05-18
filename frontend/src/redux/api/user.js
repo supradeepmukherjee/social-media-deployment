@@ -39,7 +39,7 @@ const api = createApi({
         }),
         updateProfile: mutation({
             query: data => ({
-                url: `/updateprofile`,
+                url: `/update/profile`,
                 method: `PUT`,
                 body: data,
                 credentials: 'include'
@@ -97,7 +97,7 @@ const api = createApi({
                 url: `/my-posts`,
                 credentials: 'include'
             }),
-            providesTags: ['posts']
+            providesTags: ['post']
         }),
         userPosts: query({
             query: id => ({

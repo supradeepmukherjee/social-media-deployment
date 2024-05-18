@@ -1,0 +1,21 @@
+
+
+.user {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: rgba(0, 0, 0, .5);
+    transition: all .5s;
+}
+
+.user>img {
+    height: 3vmax;
+    width: 3vmax;
+    margin: 1vmax;
+    border-radius: 100%;
+    border: 3px solid rgb(255, 201, 201);
+}
+
+.user:hover {
+    transform: translateY(-10px);
+}

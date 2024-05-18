@@ -8,7 +8,7 @@ import { useFollowMutation, useGetUserProfileQuery, useLazyGetUserProfileQuery, 
 import './Account/Account.css'
 import Loader from './Loader/Loader'
 import Post from './Post/Post'
-import User from './User'
+import User from './User/User'
 
 const UserProfile = () => {
     const { id } = useParams()
@@ -31,14 +31,14 @@ const UserProfile = () => {
             .catch(err => console.log(err))
     }
     useEffect(() => {
-        if (otherUser._id === id) setMyProfile(true)
-        if (user) {
-            user.followers.forEach(item => {
-                if (item._id === user._id) setFollowing(true)
+        if (user._id === id) setMyProfile(true)
+        if (otherUser) {
+            otherUser.followers?.forEach(({_id}) => {
+                if (_id === user._id) setFollowing(true)
                 else setFollowing(false)
             })
         }
-    }, [id, otherUser._id, user])
+    }, [id, otherUser, user._id, user?.followers])
     useErrors([
         { error, isError },
         { error: postsError, isError: postsIsError },
@@ -55,13 +55,13 @@ const UserProfile = () => {
                         posts?.map(({ _id, owner, caption, img, likes, comments }) => <Post
                             postID={_id}
                             key={_id}
-                            ownerName={owner.name}
+                            ownerName={owner?.name}
                             caption={caption}
-                            postImg={img.url}
+                            postImg={img?.url}
                             likes={likes}
                             comments={comments}
-                            ownerImg={owner.chavi.url}
-                            ownerID={owner._id}
+                            ownerImg={owner?.chavi.url}
+                            ownerID={owner?._id}
                             page='user'
                             userID={id} />)
                         :
@@ -71,9 +71,9 @@ const UserProfile = () => {
                     }
                 </div>
                 <div className="accountRight">
-                    <Avatar src={user?.chavi.url} sx={{ height: '8vmax', width: '8vmax' }} />
+                    <Avatar src={otherUser?.chavi?.url} sx={{ height: '8vmax', width: '8vmax' }} />
                     <Typography variant='h5'>
-                        {user?.name}
+                        {otherUser?.name}
                     </Typography>
                     <div className="">
                         <button onClick={() => setFollowersToggle(!followersToggle)}>
@@ -82,7 +82,7 @@ const UserProfile = () => {
                             </Typography>
                         </button>
                         <Typography>
-                            {user?.followers.length}
+                            {otherUser?.followers?.length}
                         </Typography>
                     </div>
                     <div className="">
@@ -92,7 +92,7 @@ const UserProfile = () => {
                             </Typography>
                         </button>
                         <Typography>
-                            {user?.following.length}
+                            {otherUser?.following?.length}
                         </Typography>
                     </div>
                     <div className="">
@@ -100,10 +100,10 @@ const UserProfile = () => {
                             Posts
                         </Typography>
                         <Typography>
-                            {user?.posts.length}
+                            {otherUser?.posts?.length}
                         </Typography>
                     </div>
-                    {myProfile ? null :
+                    {myProfile ? <></> :
                         <Button disabled={followLoading || loading} variant='contained' style={{ background: !following ? 'red' : 'blue' }} onClick={followHandler}>
                             {following ? 'Following' : 'Follow'}
                         </Button>}
@@ -112,12 +112,12 @@ const UserProfile = () => {
                             <Typography variant='h4'>
                                 Followers
                             </Typography>
-                            {user?.followers.length > 0 ?
-                                user?.followers.map(({ _id, name, chavi }) => <User userID={_id} key={_id} name={name} chavi={chavi.url}
+                            {otherUser?.followers?.length > 0 ?
+                                otherUser?.followers?.map(({ _id, name, chavi }) => <User userID={_id} key={_id} name={name} chavi={chavi.url}
                                 />)
                                 :
                                 <Typography style={{ margin: '2vmax' }}>
-                                    You have no followers
+                                    No followers yet
                                 </Typography>
                             }
                         </div>
@@ -127,12 +127,12 @@ const UserProfile = () => {
                             <Typography variant='h4'>
                                 Following
                             </Typography>
-                            {user && user.following.length > 0 ?
-                                user.following.map(following => <User userID={following._id} key={following._id} name={following.name} chavi={following.chavi.url}
+                            {otherUser?.following?.length > 0 ?
+                                otherUser?.following?.map(({ _id, name, chavi }) => <User userID={_id} key={_id} name={name} chavi={chavi.url}
                                 />)
                                 :
                                 <Typography style={{ margin: '2vmax' }}>
-                                    You dont follow anyone
+                                    Not following anyone yet
                                 </Typography>
                             }
                         </div>

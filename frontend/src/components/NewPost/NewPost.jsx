@@ -3,8 +3,7 @@ import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { useDispatch } from 'react-redux'
 import useMutation from '../../hooks/useMutation'
-import { useLazyGetUserQuery, useLazyMyPostsQuery } from '../../redux/api/user'
-import { useUploadMutation } from '../../redux/api/user'
+import { useLazyGetUserQuery, useUploadMutation } from '../../redux/api/user'
 import { userExists, userNotExists } from '../../redux/reducers/auth'
 import './NewPost.css'
 
@@ -26,7 +25,7 @@ const NewPost = () => {
     }
     const submitHandler = async e => {
         e.preventDefault()
-        if (caption !== '') return toast.error('Caption can\'t be blank')
+        if (caption === '') return toast.error('Caption can\'t be blank')
         if (!imgFile) return toast.error('Please upload Image')
         const formData = new FormData()
         formData.set('caption', caption)

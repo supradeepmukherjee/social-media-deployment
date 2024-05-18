@@ -1,7 +1,7 @@
 import { Button, Typography } from '@mui/material'
 import { useState } from 'react'
 import { useLazyAllUsersQuery } from '../../redux/api/user'
-import User from '../User'
+import User from '../User/User'
 import './Search.css'
 
 const Search = () => {
@@ -23,7 +23,7 @@ const Search = () => {
                 <Typography variant='h3' style={{ padding: '2vmax' }}>
                     Search a Person
                 </Typography>
-                <input type="text" placeholder='Update your Name' required value={name} onChange={e => setName(e.target.value)} />
+                <input type="text" placeholder='Type Here' required value={name} onChange={e => setName(e.target.value)} />
                 <Button disabled={loading} type='submit'>
                     Search
                 </Button>

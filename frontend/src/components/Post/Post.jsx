@@ -8,11 +8,10 @@ import { useCommentMutation, useDelPostMutation, useLikeUnlikeMutation } from '.
 import { useLazyGetUserQuery, useUpdateCaptionMutation } from '../../redux/api/user'
 import { userExists, userNotExists } from '../../redux/reducers/auth'
 import CommentCard from '../CommentCard/CommentCard'
-import User from '../User'
+import User from '../User/User'
 import './Post.css'
 
-// eslint-disable-next-line react/prop-types
-const Post = ({ postID, caption, postImg, likes = [], comments = [], ownerImg, ownerName, ownerID, isDelete = false, isAccount = false, page = '', userID, refetch }) => {
+const Post = ({ postID, caption, postImg, likes = [], comments = [], ownerImg, ownerName, ownerID, isDelete = false, isAccount = false, refetch }) => {
     const [liked, setLiked] = useState(false)
     const [likesUser, setLikesUser] = useState(false)
     const [commentValue, setCommentValue] = useState('')
@@ -29,14 +28,12 @@ const Post = ({ postID, caption, postImg, likes = [], comments = [], ownerImg, o
     const handleLike = async () => {
         setLiked(!liked)
         await likeUnlike(`${liked ? 'Liking' : 'Unliking'} Post`, postID)
-        // if (isAccount) dispatch(getMyPosts())
-        // else dispatch(getFollowingPost())
-        // if (page === 'user') dispatch(getUserPosts(userID))
         refetch()
     }
     const updateCaptionHandler = async e => {
         e.preventDefault()
         await updateCaption('Updating Caption', { id: postID, caption: captionValue })
+        setCaptionToggle(false)
         refetch()
     }
     const handleDel = async () => {
@@ -126,7 +123,7 @@ const Post = ({ postID, caption, postImg, likes = [], comments = [], ownerImg, o
             <Dialog open={captionToggle} onClose={() => setCaptionToggle(!captionToggle)}>
                 <div className="dialogBox">
                     <Typography variant='h4'>
-                        Comments
+                        Update Caption
                     </Typography>
                     <form className='commentForm' onSubmit={updateCaptionHandler}>
                         <input type="text" value={captionValue} onChange={e => setCaptionValue(e.target.value)} placeholder='Type your new caption' required />

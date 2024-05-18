@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { deleteProfile, follow, forgotPassword, getAllUsers, getMyPosts, getUserPosts, getUserProfile, login, logout, myProfile, register, resetPassword, updateCaption, updatePassword, updateProfile } from '../controllers/user.js'
+import { deleteProfile, follow, forgotPassword, getAllUsers, getMyPosts, getUserPosts, getUserProfile, login, logout, myProfile, register, resetPassword, updateCaption, updatePassword, updateProfile, createPost } from '../controllers/user.js'
 import { isAuthenticated } from '../middlewares/auth.js'
 import upload from '../middlewares/multer.js'
 

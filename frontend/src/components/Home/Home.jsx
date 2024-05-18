@@ -5,7 +5,7 @@ import { useGetPostsQuery } from '../../redux/api/post'
 import { useAllUsersQuery } from '../../redux/api/user'
 import Loader from '../Loader/Loader'
 import Post from '../Post/Post'
-import User from '../User'
+import User from '../User/User'
 import './Home.css'
 
 const Home = () => {

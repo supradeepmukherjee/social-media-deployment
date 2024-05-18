@@ -11,7 +11,7 @@ import { useDelProfileMutation, useMyPostsQuery } from '../../redux/api/user'
 import { userNotExists } from '../../redux/reducers/auth'
 import Loader from '../Loader/Loader'
 import Post from '../Post/Post'
-import User from '../User'
+import User from '../User/User'
 import './Account.css'
 
 const Account = () => {

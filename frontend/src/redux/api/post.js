@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import server from '../../constant'
 
 const api = createApi({
-    reducerPath: 'user',
+    reducerPath: 'post',
     baseQuery: fetchBaseQuery({ baseUrl: `${server}/post` }),
     endpoints: ({ mutation, query }) => ({
         comment: mutation({
