@@ -1,5 +1,6 @@
 import { Button, Typography } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import useMutation from '../../hooks/useMutation'
 import { useForgotPasswordMutation } from '../../redux/api/user'
@@ -9,11 +10,14 @@ const ForgotPassword = () => {
     const [email, setEmail] = useState('')
     const [forgotPassword, loading] = useMutation(useForgotPasswordMutation)
     const navigate = useNavigate()
-    const submitHandler = async e => {
+    const { user } = useSelector(({ auth }) => auth)
+    const submitHandler = e => {
         e.preventDefault()
-        await forgotPassword('Sending Password Reset Link to Registering Email ID', email)
-        navigate('/')
+        forgotPassword('Sending Password Reset Link to Registering Email ID', email)
     }
+    useEffect(() => {
+        if (user) return navigate('/')
+    }, [navigate, user])
     return (
         <div className='forgotPassword'>
             <form className='forgotPasswordForm' action="" onSubmit={submitHandler}>

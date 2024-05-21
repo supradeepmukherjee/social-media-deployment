@@ -32,12 +32,12 @@ const Account = () => {
       console.log(err)
       toast.error(err?.response?.data?.msg || 'Something went wrong')
     }
-    navigate('/')
+    navigate('/login')
   }
   const delHandler = async () => {
     await delProfile('Deleting Account')
     dispatch(userNotExists())
-    navigate('/')
+    navigate('/register')
   }
   useErrors([{ error, isError }])
   useEffect(() => {

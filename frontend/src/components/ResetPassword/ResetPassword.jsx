@@ -1,6 +1,7 @@
 import { Button, Typography } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { useSelector } from 'react-redux'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import useMutation from '../../hooks/useMutation'
 import { useResetPasswordMutation } from '../../redux/api/user'
@@ -10,6 +11,7 @@ import './ResetPassword.css'
 const ResetPassword = () => {
     const [password, setPassword] = useState('')
     const [cpassword, setcPassword] = useState('')
+    const { user } = useSelector(({ auth }) => auth)
     const { token } = useParams()
     const navigate = useNavigate()
     const [resetPassword, loading] = useMutation(useResetPasswordMutation)
@@ -20,8 +22,11 @@ const ResetPassword = () => {
         if (validationMsg !== '') return toast.error(validationMsg)
         if (password !== cpassword) return toast.error('Passwords don\'t match ')
         await resetPassword('Resetting Password', { token, password })
-        navigate('/')
+        navigate('/login')
     }
+    useEffect(() => {
+        if (user) return navigate('/')
+    }, [navigate, user])
     return (
         <div className='resetPassword'>
             <form className='resetPasswordForm' action="" onSubmit={submitHandler}>

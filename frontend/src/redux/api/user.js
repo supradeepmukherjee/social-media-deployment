@@ -6,24 +6,6 @@ const api = createApi({
     baseQuery: fetchBaseQuery({ baseUrl: `${server}/user` }),
     tagTypes: ['user', 'post'],
     endpoints: ({ mutation, query }) => ({
-        register: mutation({
-            query: data => ({
-                url: `/register`,
-                method: `POST`,
-                body: data,//file
-                credentials: 'include'
-            }),
-            invalidatesTags: ['user']
-        }),
-        login: mutation({
-            query: ({ email, password }) => ({
-                url: `/login`,
-                method: `POST`,
-                body: { email, password },
-                credentials: 'include'
-            }),
-            invalidatesTags: ['user']
-        }),
         getUser: query({
             query: () => ({
                 url: '/myProfile',
@@ -127,4 +109,4 @@ const api = createApi({
 })
 
 export default api
-export const { useAllUsersQuery, useLazyAllUsersQuery, useChangePasswordMutation, useForgotPasswordMutation, useGetUserProfileQuery, useLazyGetUserProfileQuery, useGetUserQuery, useLoginMutation, useRegisterMutation, useResetPasswordMutation, useUpdateProfileMutation, useLazyGetUserQuery, useFollowMutation, useDelProfileMutation, useMyPostsQuery, useLazyMyPostsQuery, useUserPostsQuery, useUploadMutation, useUpdateCaptionMutation } = api
+export const { useAllUsersQuery, useLazyAllUsersQuery, useChangePasswordMutation, useForgotPasswordMutation, useGetUserProfileQuery, useLazyGetUserProfileQuery, useGetUserQuery,  useResetPasswordMutation, useUpdateProfileMutation, useLazyGetUserQuery, useFollowMutation, useDelProfileMutation, useMyPostsQuery, useLazyMyPostsQuery, useUserPostsQuery, useUploadMutation, useUpdateCaptionMutation } = api

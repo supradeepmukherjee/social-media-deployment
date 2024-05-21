@@ -1,27 +1,45 @@
 import { Button, Typography } from '@mui/material'
-import { useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { Link, useNavigate } from 'react-router-dom'
-import useMutation from '../../hooks/useMutation'
-import { useLazyGetUserQuery, useLoginMutation } from '../../redux/api/user'
-import { userExists, userNotExists } from '../../redux/reducers/auth'
+import axios from 'axios'
+import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link, redirect, useNavigate } from 'react-router-dom'
+import server from '../../constant'
+import { userExists } from '../../redux/reducers/auth'
 import './Login.css'
 
 const Login = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [loading, setLoading] = useState(false)
+    const { user } = useSelector(({ auth }) => auth)
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    const [login, loading] = useMutation(useLoginMutation)
-    const [getUser] = useLazyGetUserQuery()
     const loginHandler = async e => {
         e.preventDefault()
-        await login('Logging In', { email, password })
-        getUser()
-            .then(({ data }) => dispatch(userExists(data.user)))
-            .catch(() => dispatch(userNotExists()))
-        navigate('/')
+        const id = toast.loading('Logging In...')
+        setLoading(true)
+        try {
+            const { data } = await axios.post(`${server}/user/login`,
+                { email, password },
+                {
+                    withCredentials: true,
+                    headers: { 'Content-Type': 'application/json' }
+                }
+            )
+            dispatch(userExists(data.user))
+            toast.success(data.msg, { id })
+            redirect('/')
+        } catch (err) {
+            console.log(err)
+            toast.error(err?.response?.data?.msg || 'Something went wrong', { id })
+        } finally {
+            setLoading(false)
+        }
     }
+    useEffect(() => {
+        if (user) return navigate('/')
+    }, [navigate, user])
     return (
         <div className='login'>
             <form className='loginForm' action="" onSubmit={loginHandler}>

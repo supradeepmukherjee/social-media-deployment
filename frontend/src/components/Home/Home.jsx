@@ -19,7 +19,7 @@ const Home = () => {
   ])
   useEffect(() => {
     if (data) setUsers(data.users)
-    if (postsData) setPosts(data.posts)
+    if (postsData) setPosts(postsData.posts)
   }, [data, postsData])
   return (
     isLoading || postsLoading ? <Loader /> :
